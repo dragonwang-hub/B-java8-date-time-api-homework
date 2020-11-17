@@ -1,6 +1,8 @@
 package com.thoughtworks.capability.gtb;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 /**
@@ -25,14 +27,21 @@ public class MeetingSystemV3 {
     // 从字符串解析得到会议时间
     LocalDateTime meetingTime = LocalDateTime.parse(timeStr, formatter);
 
+    ZonedDateTime meetingTimeInLondon =meetingTime.atZone(ZoneId.of("UTC+0"));
+    System.out.println(meetingTimeInLondon);
+
     LocalDateTime now = LocalDateTime.now();
-    if (now.isAfter(meetingTime)) {
-      LocalDateTime tomorrow = now.plusDays(1);
+    ZonedDateTime meetingTimeInBeiJinNow =now.atZone(ZoneId.of("UTC+8"));
+    System.out.println(meetingTimeInBeiJinNow);
+    if (meetingTimeInBeiJinNow.isAfter(meetingTimeInLondon)) {
+      ZonedDateTime tomorrow = meetingTimeInBeiJinNow.plusDays(1);
       int newDayOfYear = tomorrow.getDayOfYear();
-      meetingTime = meetingTime.withDayOfYear(newDayOfYear);
+      ZonedDateTime newMeetingTimeInLondon = meetingTimeInLondon.withDayOfYear(newDayOfYear);
+
+      ZonedDateTime meetingTimeInChicago = newMeetingTimeInLondon.withZoneSameInstant(ZoneId.of("UTC-6"));
 
       // 格式化新会议时间
-      String showTimeStr = formatter.format(meetingTime);
+      String showTimeStr = formatter.format(meetingTimeInChicago);
       System.out.println(showTimeStr);
     } else {
       System.out.println("会议还没开始呢");
